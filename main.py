@@ -1,6 +1,5 @@
 """
 choixMenu = ["Démarrer le jeu", "Afficher le classement", "Quitter"]
-choixPersonnages = GetListePersonnages()
 
 isEmptyOrWhiteSpace(chaine):
     retourne si la chaine est vide ou ne contient que des espaces
@@ -9,7 +8,7 @@ isInRange(tableauChoix,valeur):
     retourne si la valeur est dans l'intervalle
 
 afficherChoix(message, choix) :
-    affiche un message ainsi que l'ensemble des choix disponibles
+    affiche un message ainsi que l'ensemble des choix disponibles avec leur numéro associé
 
 estDejaDansListe(liste, valeur):
     retourne si le personnage est contenue dans la liste
@@ -18,37 +17,61 @@ teamIsAlive():
     retourne si tous les personnages sont mort 
 
 monstreIsAlive():
-    retourne si le monstre est mort        
+    retourne si le monstre est mort  
+
+attaquer(personnage):
+    soustrait aux pv du monstre la soustraction de l'attaque du personnage et la defense du monstre
+
+attaqueDuMonstre():
+    soustrait aux pv d'un personnage aléatoire de l'équipe la soustraction de l'attaque du monstre et de la défense du personnage
      
 MENU :
     AFFICHER LES CHOIX POSSIBLES :
         afficherChoix(message, choixMenu)
-    RECUPERER LE CHOIX : 
-        tant que vrai :
-            vérifier le choix :
-                isInRange(choixMenu, choix)
+    tant que vrai : 
+        récupérer le choix :
+            vérifier le choix
+            si isInRange(choixMenu, choix):
+                retourner choix
+            sinon :
+                lancer fonction erreur
     JEU:
         CHOIX NOM UTILISATEUR:
-            Récupérer le nom d'utilisateur :
-                Tant que vrai:
-                    Vérifier le nom :
-                       EmptyOrWhiteSpace(nomUtilisateur)
+            tant que vrai :
+                récupérer le nom d'utilisateur:
+                    Vérifier le nom 
+                    si EmptyOrWhiteSpace(nomUtilisateur):
+                        retourner choix
+                    sinon :
+                        lancer fonction erreur
         CREATION D'EQUIPE:
-            Récupérer le nom d'équipe :
-                Tant que vrai:
-                    Vérifier le nom d'équipe:
-                        isEmptyOrWhiteSpace(nomEquipe)
+            tant que vrai :
+                récupérer le nom d'utilisateur:
+                    Vérifier le nom d'équipe
+                    si isEmptyOrWhiteSpace(nomEquipe) :
+                        retourner nomEquipe
+                    sinon :
+                        lancer fonction erreur
             Afficher équipe actuelle
             Choisir les personnages :
+                Récupérer la liste des personnages:
+                    ouvrir base
+                    acceder à collection personnages
                 Tant que nombre personnage < 3:
                 Afficher liste personnages : 
                     afficherChoix(message, choixPersonnages)
                 RECUPERER LE CHOIX : 
                     tant que vrai :
-                        vérifier si le choix est valide:
-                            isInRange(choixPersonnages, choix)
-                        vérifier si le personnage est deja pris :
-                            estDejaDansListe(choixPersonnages,choix)
+                        vérifier si le choix est valide
+                        si isInRange(choixPersonnages, choix):
+                            continuer
+                        sinon :
+                            lancer fonction erreur
+                        vérifier si le personnage est deja pris
+                        si estDejaDansListe(choixPersonnages,choix):
+                            retourner choix
+                        sinon :
+                            lancer fonction erreur
         COMBAT : 
             Tant que teamIsAlive() :
                 instancierMonstre()
@@ -60,7 +83,7 @@ MENU :
                            passer a la prochaine boucle   
                     attaqueDuMonstre()
             Sauvegarder le nombre de vagues
-            Afficher le nombre de vagues + afficher classement 
+            Afficher le nombre de vagues + afficher classement (juste après)
 
     CLASSEMENT:
         Afficher les score :
@@ -74,5 +97,6 @@ MENU :
             retourner les éléments
         
     QUITTER:
+        sys.exit()
         
 """
