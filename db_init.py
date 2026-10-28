@@ -18,9 +18,8 @@ def genererMonstreAleatoire():
     for m in monstresEnBase.find():
         monstre = Monstre(m["_id"], m["name"], m["attack"], m["defense"], m["hp"])
         listeMonstres.append(monstre)
-    print (len(listeMonstres))
     monstre = listeMonstres[getNombreAleatoire(len(listeMonstres)-1)]
-    print (f"le monstre est {monstre.name}, il a {monstre.hp} pv")
+    print (f"Vous affrontez le  {monstre.name}, il a {monstre.hp} pv")
     return monstre
 
 def chargerScores():
@@ -41,7 +40,6 @@ def chargerScores():
 def insererScore(score):
     scoresEnBase = db["scores"]
     result = scoresEnBase.insert_one(score)
-    print("Inserted document ID:", result.inserted_id)
 
     
         
