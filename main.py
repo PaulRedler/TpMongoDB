@@ -105,8 +105,6 @@ MENU :
         
 """
 choixMenu = ["Démarrer le jeu", "Afficher le classement", "Quitter"]
-nbVague = 1
-pseudo = ""
 def menu():
     option = choixNumerique("Veuillez choisir une option", choixMenu, valeurInterdite)
     if (option == 1):
@@ -120,23 +118,34 @@ def jeu():
     personnages = chargerPersonnages()
     pseudo = choixTextuel("Veuillez choisir un pseudo", messageStringInvalide)
     equipe = creerEquipe(personnages)
-    combat(equipe)
+    combat(equipe, pseudo)
 
 
-def combat(equipe):
+def combat(equipe, pseudo):
+    while True:
+        monstre = genererMonstreAleatoire()
+        victoire = lancer_vague()
+        if not victoire:
+            break
+        vague += 1
+
+
+def combat(equipe, pseudo):
+    nbVagues = 1
+    print (teamIsAlive(equipe))
     while teamIsAlive(equipe):
         monstre = genererMonstreAleatoire()
         while monstreIsAlive(monstre):
             for personnage in equipe:
                 if(isAlive(personnage)):
                     attaquer(personnage, monstre)
-                    if(not monstreIsAlive()):
-                        nbVague += 1
+                    if(not monstreIsAlive(monstre)):
+                        nbVagues += 1
                         #passer a la prochaine boucle du premier while
             attaqueDuMonstre(equipe,monstre)
-    score = Score(1, pseudo, nbVague)
+    score = {"id" : 1,  "player_name" : pseudo, "waves" : nbVagues}
     insererScore(score)
-    messageFinPartie()
+    messageFinPartie(nbVagues)
     afficherClassement()
     
 
@@ -152,8 +161,8 @@ def afficherClassement():
         print(f"{i+1}-{classement[i].player_name}-{classement[i].waves}vagues")
 
 
-def messageFinPartie():
-    print(f"Fin de partie, vous avez vaincu {nbVague} vagues")
+def messageFinPartie(nbVagues):
+    print(f"Fin de partie, vous avez vaincu {nbVagues} vagues")
 
 def messageStringInvalide():
     print("Nom invalide")
@@ -168,11 +177,12 @@ def isEmptyOrWhiteSpace(string):
 def creerEquipe(personnages):
     equipe = []
     while (len(equipe) < 3):
-        indexPersonnage = choixNumerique("Veuillez choisir un personnage", personnages, valeurInterdite)
+        indexPersonnage = choixNumeriquePersonnage("Veuillez choisir un personnage", personnages, valeurInterdite)
         if estDejaDansListe(personnages[indexPersonnage-1], equipe):
             print("ce personnage est deja dans l'équipe")
         else:
             equipe.append(personnages[indexPersonnage-1])
+            print(f"personnage {personnages[indexPersonnage-1].name}ajoute")
     return equipe
 
 
@@ -180,6 +190,17 @@ def choixNumerique(message,tableauChoix, fonctionErreur):
     while (True):
         for i in range(len(tableauChoix)):
             print(f"{i+1}-{tableauChoix[i]}")
+        valeur = int(input(message))
+        if(isInRange(tableauChoix , valeur)):
+            return valeur
+        else: fonctionErreur
+
+
+
+def choixNumeriquePersonnage(message,tableauChoix, fonctionErreur):
+    while (True):
+        for i in range(len(tableauChoix)):
+            print(f"{i+1}-{tableauChoix[i].name}")
         valeur = int(input(message))
         if(isInRange(tableauChoix , valeur)):
             return valeur
@@ -202,26 +223,26 @@ def estDejaDansListe(personnage, equipe):
 def teamIsAlive(equipe):
     nbMort = 0
     for p in equipe:
-        if(not p.isAlive()):
+        if(not isAlive(p)):
             nbMort +=1
-    return nbMort == 3
+    return nbMort != 3
 
 def isAlive(personnage):
     return personnage.hp > 0
 
 def getTeamAlive(equipe):
-    return equipe.filter(lambda p : p.isAlive())
+    return list(filter(lambda p : isAlive(p),equipe))
 
 def monstreIsAlive(monstre):
-    return monstre.pv > 0
+    return monstre.hp > 0
 
 def attaquer(personnage, monstre):
     monstre.hp -= (personnage.attack - monstre.defense) 
 
 def attaqueDuMonstre(equipe, monstre):
     personnagesAttaquables = getTeamAlive(equipe)
-    indexAleatoire = getNombreAleatoire(personnagesAttaquables)
-    personnageCible = personnagesAttaquables[indexAleatoire]
+    indexAleatoire = getNombreAleatoire(len(personnagesAttaquables))
+    personnageCible = personnagesAttaquables[indexAleatoire-1]
     personnageCible.hp -= (monstre.attack - personnageCible.defense)
 
 def quitter():

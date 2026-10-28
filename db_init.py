@@ -18,18 +18,25 @@ def genererMonstreAleatoire():
     for m in monstresEnBase.find():
         monstre = Monstre(m["_id"], m["name"], m["attack"], m["defense"], m["hp"])
         listeMonstres.append(monstre)
-    monstre = listeMonstres[getNombreAleatoire(listeMonstres.length)]
+    print (len(listeMonstres))
+    monstre = listeMonstres[getNombreAleatoire(len(listeMonstres)-1)]
     print (f"le monstre est {monstre.name}, il a {monstre.hp} pv")
     return monstre
 
 def chargerScores():
     scoresEnBase = db["scores"]
     listeScores = []
-    for s in scoresEnBase :
+    for s in scoresEnBase.find() :
         score = Score(s["_id"], s["player_name"], s["waves"])
         listeScores.append(score)
-    listeOrdonee = sorted(listeScores, key = lambda s : s.score)
-    return [listeOrdonee[-3:-1]]
+    listeOrdonee = sorted(listeScores, key = lambda s : s.waves)
+    listeFinale = []
+    listeFinale.append(listeOrdonee[-1])
+    listeFinale.append(listeOrdonee[-2])
+    listeFinale.append(listeOrdonee[-3])
+    return listeFinale
+
+
 
 def insererScore(score):
     scoresEnBase = db["scores"]
