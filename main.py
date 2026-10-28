@@ -1,3 +1,6 @@
+import sys
+from utils import *
+from db_init import * 
 """
 choixMenu = ["Démarrer le jeu", "Afficher le classement", "Quitter"]
 
@@ -23,7 +26,7 @@ attaquer(personnage):
     soustrait aux pv du monstre la soustraction de l'attaque du personnage et la defense du monstre
 
 attaqueDuMonstre():
-    soustrait aux pv d'un personnage aléatoire de l'équipe la soustraction de l'attaque du monstre et de la défense du personnage
+    soustrait aux pv d'un personnage aléatoire vivant de l'équipe la soustraction de l'attaque du monstre et de la défense du personnage
      
 MENU :
     AFFICHER LES CHOIX POSSIBLES :
@@ -77,7 +80,8 @@ MENU :
                 instancierMonstre()
                 Tant que monstreIsAlive():
                     Pour chaques personnages :
-                        attaquer(personnage)
+                        si isAlive(personnage) :
+                            attaquer(personnage)
                         si !monstreIsAlive():
                            incrementer le nombre de vague
                            passer a la prochaine boucle   
@@ -100,3 +104,128 @@ MENU :
         sys.exit()
         
 """
+choixMenu = ["Démarrer le jeu", "Afficher le classement", "Quitter"]
+nbVague = 1
+pseudo = ""
+def menu():
+    option = choixNumerique("Veuillez choisir une option", choixMenu, valeurInterdite)
+    if (option == 1):
+        jeu()
+    elif(option == 2):
+        afficherClassement()
+    elif(option == 3):
+        quitter()
+
+def jeu():
+    personnages = chargerPersonnages()
+    pseudo = choixTextuel("Veuillez choisir un pseudo", messageStringInvalide)
+    equipe = creerEquipe(personnages)
+    combat(equipe)
+
+
+def combat(equipe):
+    while teamIsAlive(equipe):
+        monstre = genererMonstreAleatoire()
+        while monstreIsAlive(monstre):
+            for personnage in equipe:
+                if(isAlive(personnage)):
+                    attaquer(personnage, monstre)
+                    if(not monstreIsAlive()):
+                        nbVague += 1
+                        #passer a la prochaine boucle du premier while
+            attaqueDuMonstre(equipe,monstre)
+    score = Score(1, pseudo, nbVague)
+    insererScore(score)
+    messageFinPartie()
+    afficherClassement()
+    
+
+                
+
+
+
+
+
+def afficherClassement():
+    classement = chargerScores()
+    for i in range(len(classement)):
+        print(f"{i+1}-{classement[i].player_name}-{classement[i].waves}vagues")
+
+
+def messageFinPartie():
+    print(f"Fin de partie, vous avez vaincu {nbVague} vagues")
+
+def messageStringInvalide():
+    print("Nom invalide")
+
+def valeurInterdite():
+    print("Valeur non-autorisée")
+def isInRange(tableauChoix, valeur):
+    return (valeur >=1 & valeur <=len(tableauChoix))
+def isEmptyOrWhiteSpace(string):
+    return not string or not string.strip()
+
+def creerEquipe(personnages):
+    equipe = []
+    while (len(equipe) < 3):
+        indexPersonnage = choixNumerique("Veuillez choisir un personnage", personnages, valeurInterdite)
+        if estDejaDansListe(personnages[indexPersonnage-1], equipe):
+            print("ce personnage est deja dans l'équipe")
+        else:
+            equipe.append(personnages[indexPersonnage-1])
+    return equipe
+
+
+def choixNumerique(message,tableauChoix, fonctionErreur):
+    while (True):
+        for i in range(len(tableauChoix)):
+            print(f"{i+1}-{tableauChoix[i]}")
+        valeur = int(input(message))
+        if(isInRange(tableauChoix , valeur)):
+            return valeur
+        else: fonctionErreur
+
+def choixTextuel(message, fonctionErreur):
+    while (True):
+        valeur = str(input(message))
+        if(isEmptyOrWhiteSpace(valeur)):
+            fonctionErreur
+        else :
+            return valeur
+
+def estDejaDansListe(personnage, equipe):
+    for p in equipe:
+        if (personnage.id == p.id):
+            return True
+    return False
+
+def teamIsAlive(equipe):
+    nbMort = 0
+    for p in equipe:
+        if(not p.isAlive()):
+            nbMort +=1
+    return nbMort == 3
+
+def isAlive(personnage):
+    return personnage.hp > 0
+
+def getTeamAlive(equipe):
+    return equipe.filter(lambda p : p.isAlive())
+
+def monstreIsAlive(monstre):
+    return monstre.pv > 0
+
+def attaquer(personnage, monstre):
+    monstre.hp -= (personnage.attack - monstre.defense) 
+
+def attaqueDuMonstre(equipe, monstre):
+    personnagesAttaquables = getTeamAlive(equipe)
+    indexAleatoire = getNombreAleatoire(personnagesAttaquables)
+    personnageCible = personnagesAttaquables[indexAleatoire]
+    personnageCible.hp -= (monstre.attack - personnageCible.defense)
+
+def quitter():
+    sys.exit()
+
+
+menu()
