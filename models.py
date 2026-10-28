@@ -12,7 +12,6 @@ class Monstre :
         self.attack = attack
         self.defense = defense
         self.hp = hp
-
 class Score :
     def __init__(self, id, player_name, waves):
         self.id = id

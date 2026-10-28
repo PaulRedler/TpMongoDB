@@ -22,18 +22,17 @@ def genererMonstreAleatoire():
     print (f"Vous affrontez le  {monstre.name}, il a {monstre.hp} pv")
     return monstre
 
+def getNombreAleatoire(max):
+    return randint(1,max)
+
 def chargerScores():
     scoresEnBase = db["scores"]
     listeScores = []
     for s in scoresEnBase.find() :
         score = Score(s["_id"], s["player_name"], s["waves"])
         listeScores.append(score)
-    listeOrdonee = sorted(listeScores, key = lambda s : s.waves)
-    listeFinale = []
-    listeFinale.append(listeOrdonee[-1])
-    listeFinale.append(listeOrdonee[-2])
-    listeFinale.append(listeOrdonee[-3])
-    return listeFinale
+    listeOrdonee = sorted(listeScores, key = lambda s : s.waves, reverse = True)
+    return listeOrdonee[:3]
 
 
 

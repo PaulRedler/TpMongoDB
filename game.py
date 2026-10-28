@@ -10,67 +10,41 @@ def jeu():
     equipe = creerEquipe(personnages)
     combat(equipe, pseudo)
 
+#Combat
 def combat(equipe, pseudo):
     vague = 1
+    equipeEnVie = [*equipe]
     while True:
         monstre = genererMonstreAleatoire()
-        victoire = lancer_vague(equipe,monstre)
+        victoire = lancer_vague(equipeEnVie,monstre)
         if not victoire:
             score = {"id" : 1,  "player_name" : pseudo, "waves" : vague}
             insererScore(score)
-            afficherFinDePartie(vague)
+            afficherMessageFinPartie(vague)
+            afficherClassement()
             return
         vague += 1
         print(f"Vous avez battu le monstre {monstre.name}")
 
-def lancer_vague(equipe, monstre):
-        equipeEnVie = [*equipe]
+def lancer_vague(equipeEnVie, monstre):
         while monstreIsAlive(monstre):
             for personnage in equipeEnVie:
                 attaquer(personnage, monstre)
                 if(not monstreIsAlive(monstre)):
                     return True
-            attaqueDuMonstre(equipeEnVie,monstre)
-            if not teamIsAlive(equipe):
+            attaqueDuMonstre(equipeEnVie, monstre)
+            if not teamIsAlive(equipeEnVie):
                 return False
 
-
-
-def creerEquipe(personnages):
-    equipe = []
-    personnagesDisponibles = personnages
-    while (len(equipe) < nbMaxEquipier): 
-        messageSelection = formerMessageSelection(personnagesDisponibles)
-        choixUtilisateur = recupererChoixNumerique(messageSelection, personnagesDisponibles, afficherMessageEntierInvalide)
-        ajouterEquipier(personnagesDisponibles, choixUtilisateur, equipe)
-        
-    return equipe
-
-def estDejaDansListe(personnage, equipe):
-    for p in equipe:
-        if (personnage.id == p.id):
-            return True
-    return False
-
-def ajouterEquipier(personnagesDisponibles, choixUtilisateur, equipe):
-    equipier = personnagesDisponibles[choixUtilisateur-1]
-    equipe.append(equipier)
-    personnagesDisponibles.remove(equipier)
-    print(f"personnage {equipier.name} ajoute")
-
+def isAlive(personnage):
+    return personnage.hp > 0
 
 def teamIsAlive(equipe):
     nbMort = 0
     for p in equipe:
         if(not isAlive(p)):
             nbMort +=1
-    return nbMort != nbMaxEquipier
-
-def isAlive(personnage):
-    return personnage.hp > 0
-
-def getTeamAlive(equipe):
-    return list(filter(lambda p : isAlive(p),equipe))
+    return nbMort != len(equipe)
 
 def monstreIsAlive(monstre):
     return monstre.hp > 0
@@ -85,6 +59,24 @@ def attaqueDuMonstre(equipeEnVie, monstre):
     if(not isAlive(personnageCible)):
         equipeEnVie.remove(personnageCible)
 
-def afficherFinDePartie(vague):
-    afficherMessageFinPartie(vague)
-    afficherClassement()
+#Gestion équipe
+def creerEquipe(personnages):
+    equipe = []
+    personnagesDisponibles = personnages
+    while (len(equipe) < nbMaxEquipier): 
+        messageSelection = formerMessageSelection(personnagesDisponibles)
+        choixUtilisateur = recupererChoixNumerique(messageSelection, personnagesDisponibles, afficherMessageEntierInvalide)
+        ajouterEquipier(personnagesDisponibles, choixUtilisateur, equipe)
+    return equipe
+
+def estDejaDansListe(personnage, equipe):
+    for p in equipe:
+        if (personnage.id == p.id):
+            return True
+    return False
+
+def ajouterEquipier(personnagesDisponibles, choixUtilisateur, equipe):
+    equipier = personnagesDisponibles[choixUtilisateur-1]
+    equipe.append(equipier)
+    personnagesDisponibles.remove(equipier)
+    print(f"personnage {equipier.name} ajoute")

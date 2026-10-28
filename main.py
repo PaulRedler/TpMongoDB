@@ -16,14 +16,11 @@ def menu():
         menu()
     elif(option == 3):
         quitter()
-      
+
 def quitter():
     sys.exit()
 
-
-
 menu()
-
 
 """
 choixMenu = ["Démarrer le jeu", "Afficher le classement", "Quitter"]

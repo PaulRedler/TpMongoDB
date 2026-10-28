@@ -1,5 +1,5 @@
 from random import randint
-
+from classement import *
 def getNombreAleatoire(max):
     return randint(1,max)
 
@@ -29,7 +29,7 @@ def afficherMessageEntierInvalide():
     print("Valeur non-autorisée")
 
 def isInRange(tableauChoix, valeur):
-    return (valeur >=1 & valeur <=len(tableauChoix))
+    return (valeur >=1 and valeur <=len(tableauChoix))
 
 def isEmptyOrWhiteSpace(string):
     return not string or not string.strip()
